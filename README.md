@@ -1,5 +1,5 @@
 
-n ta completo, quando eu terminar farei o fork do meu repo principal, ele ta publico tb. to ajeitando a conecao com o servidor ainda. rodar dentro da pasta backend:
+n ta completo, quando eu terminar farei o synk fork do meu repo principal, ele ta publico tb. to ajeitando a conecao com o servidor ainda. rodar dentro da pasta backend:
 
 ```js
 
