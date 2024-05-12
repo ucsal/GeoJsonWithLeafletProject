@@ -3,7 +3,7 @@ lib usada:
 https://github.com/gipong/shp2geojson.js.git
 
 
-n ta completo, quando eu terminar farei o synk fork do meu repo principal, ele ta publico tb. to ajeitando a conecao com o servidor ainda. rodar dentro da pasta backend:
+n ta completo, quando eu terminar farei o synk fork do meu repo principal, ele ta publico btw. to ajeitando a conexao com o servidor ainda. rodar dentro da pasta backend:
 
 ```js
 
