@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 	<head>
@@ -9,7 +10,7 @@
 	<body>
 	<div id="wrap" class="wrap">
 	<div id="map" ></div>
-
+<!-- talvez eu va usar esse krl, n sei -->
 
 	<!-- <div id="saveGeojson"><div class="ui page grid">
 		<div class="sixteen wide column center aligned">
@@ -111,9 +112,8 @@
 			</div></div>
 		</div>
 
- 	</div></div>
+ 	</div>
 
-	<div class="overlay"></div>
 
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
 	<link rel="stylesheet" href="demo/semantic.min.css"></link>
@@ -124,14 +124,19 @@
 	<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
 	<script src="lib/jszip.js"></script>
 	<script src="lib/jszip-utils.js"></script>
-	<!--[if IE]>
-	<script type="text/javascript" src="lib/jszip-utils-ie.js"></script>
-	<![endif]-->
+
 	<script src="demo/semantic.min.js"></script>
 	<script src="preprocess.js"></script>
 	<script src="preview.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		
+	</script>
+
+
 	<script type="text/javascript" charset="UTF-8">
 	$(document).ready(function() {
+		
+		
 
 		var map = L.map('map').setView([ 0, 0 ], 2),
 		file,
@@ -170,27 +175,8 @@
 		}
 
 
-	// 	function saveGeoJSON(){
-
-	// 				$.ajax({
-    //     url: '/saveGeoJSON', // Rota no servidor para salvar o GeoJSON
-    //     type: 'POST',
-    //     contentType: 'application/json',
-    //     data: JSON.stringify(data), // Envie o GeoJSON como uma string JSON
-    //     success: function(response) {
-    //         console.log('GeoJSON enviado com sucesso para o servidor.');
-    //         // Exibir mensagem de sucesso para o usuário, se necessário
-    //     },
-    //     error: function(xhr, status, error) {
-    //         console.error('Erro ao enviar GeoJSON para o servidor:', error);
-    //         // Lidar com erros, se necessário
-    //     }
-    // });
-
-	// 	}
-
-
-	function saveGeojsonDB() {
+		function saveGeojsonDB() {
+			
     var epsg = ($('#epsg').val() == '') ? 4326 : $('#epsg').val(),
         encoding = ($('#encoding').val() == '') ? 'UTF-8' : $('#encoding').val();
     if (file.name.split('.')[1] == 'zip') {
@@ -199,15 +185,34 @@
             url: file,
             encoding: encoding,
             EPSG: epsg
-        }, function(data) {
-            geojson = data;
+        }, async function(data) {
+//transformando geojson em gzip, mds que krl dificil 
+			const stream = new Blob([JSON.stringify(data)], {
+    type: 'application/json',
+}).stream();
+const compressedReadableStream = stream.pipeThrough(
+    new CompressionStream("gzip")
+);
+const compressedResponse = 
+  await new Response(compressedReadableStream);
+			
+//usando o axios pra mandar pro node, acho q vai funfar
 
-			$('.dimmer').removeClass('active');
-					$('#preview').addClass('disabled');
-					$('#epsg').val('');
-					$('#encoding').val('');
-					$('#info').addClass('picInfo');
-					$('#option').slideUp(500);
+            axios.post('api/save', { geojson: data })
+                .then(function(response) {
+                    $('.dimmer').removeClass('active');
+                    $('#preview').addClass('disabled');
+                    $('#epsg').val('');
+                    $('#encoding').val('');
+                    $('#info').addClass('picInfo');
+                    $('#option').slideUp(500);
+                
+					alert("geojson Salvo no banco de dados")
+				
+				})
+                .catch(function(error) {
+                    alert('Erro ao salvar GeoJSON no banco de dados:', error);
+                });
         });
     } else {
         $('.modal').modal('show');
